@@ -1,2 +1,2 @@
 # gas_hulic_article
-hulic様向けの資金調達情報をスクレイピング＠PRTIMESするためのGASコード
+Hulic様向けの資金調達情報をスクレイピング＠PRTIMESするためのGASコード
