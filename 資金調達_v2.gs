@@ -2,10 +2,10 @@ const unique_sheetname = "Mock:資金調達情報"
 const target_fromt_day = 8; //デフォルト前日 //00:00〜
 const target_to_day = 8; //デフォルト前日 //〜23:59
 
-//朝6時に前日の記事をSync
+//朝6時に前日～当日（最新）の記事をSync
 function ReadURL_Cycle(){
 
-  ReadURL_prod(1,1)
+  ReadURL_prod(1,0)
 }
 
 function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
