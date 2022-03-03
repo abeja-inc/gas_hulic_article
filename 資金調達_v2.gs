@@ -51,7 +51,11 @@ function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
           var trim_title = company_info.title;
 
           if(trim_title.indexOf("億円", 0)!=-1){
-            var sliceText = trim_title.slice(trim_title.indexOf("億円", 0)-5, trim_title.indexOf("億円", 0))
+            var slice_index = 0;
+            if(trim_title.indexOf("億円", 0)>=5){
+              slice_index = trim_title.indexOf("億円", 0)-5;
+            }
+            var sliceText = trim_title.slice(slice_index, trim_title.indexOf("億円", 0))
             var RegExp = /\d+\.?\d*|\d*\.?\d+/;
             result = sliceText.match(RegExp);
             uniqueDataSheet.getRange(lastRow+1,11).setValue(result+"億円");
