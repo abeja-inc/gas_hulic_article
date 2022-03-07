@@ -31,13 +31,14 @@ function createList() {
       dst.getRange(r,7).setValue("-"); //担当者
       dst.getRange(r,8).setValue("-"); //電話番号
       dst.getRange(r,9).setValue("-"); //メールアドレス
-      dst.getRange(r,10).setValue(nds[9]); //記事タイトル
-      dst.getRange(r,11).setValue(nds[12]); //記事URL
+      dst.getRange(r,10).setValue(nds[1]); //日時
+      dst.getRange(r,11).setValue(nds[9]); //記事タイトル
+      dst.getRange(r,12).setValue(nds[12]); //記事URL
       r++;
     });
 
-    //リストのソート（IDの降順）
-    dst.getRange(2, 1, dst.getLastRow(), dst.getLastColumn()).sort({column: 1, ascending: false});
+    //リストのソート（日時の降順）
+    dst.getRange(2, 1, dst.getLastRow(), dst.getLastColumn()).sort({column: 10, ascending: false});
   };
 
   const validatorBuilder = (cond) => (e) => e[getColNumber(cond.column)] != cond.value;
