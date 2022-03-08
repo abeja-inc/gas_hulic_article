@@ -21,6 +21,8 @@ function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
   //ページネーション判定
   var next_flg = true;
   var page_index = 1
+
+  //最新のIDを取得
   var id = spreadSheetByActive.getSheetByName(id_sheetname).getRange(2,1).getValue();
 
   while(next_flg){
@@ -102,7 +104,11 @@ function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
   //リストのソート（日時の降順）
   uniqueDataSheet.getRange(2, 1, uniqueDataSheet.getLastRow(), uniqueDataSheet.getLastColumn()).sort({column: 2, ascending: false});
 
+  //最新のIDで上書き
   spreadSheetByActive.getSheetByName(id_sheetname).getRange(2,1).setValue(id);
+
+  //共有シートへ転記
+  createList()
 
 }
 
