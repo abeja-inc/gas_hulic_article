@@ -1,4 +1,5 @@
 const unique_sheetname = "Mock:資金調達情報"
+const id_sheetname = "id"
 const target_fromt_day = 8; //デフォルト前日 //00:00〜
 const target_to_day = 8; //デフォルト前日 //〜23:59
 
@@ -20,7 +21,9 @@ function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
   //ページネーション判定
   var next_flg = true;
   var page_index = 1
-  var id = 0;
+
+  //最新のIDを取得
+  var id = spreadSheetByActive.getSheetByName(id_sheetname).getRange(2,1).getValue();
 
   while(next_flg){
 
@@ -63,7 +66,7 @@ function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
 
           var priority = (result >= 10) ? "1": (result != 0) ? "2": "3";
 
-          uniqueDataSheet.getRange(lastRow+1,1).setValue(Utilities.formatDate(new Date(time[i]), 'JST', 'yyyy/MM/dd') +'_'+ id);
+          uniqueDataSheet.getRange(lastRow+1,1).setValue(id);
           uniqueDataSheet.getRange(lastRow+1,2).setValue(time[i].trim());
           uniqueDataSheet.getRange(lastRow+1,3).setValue(priority);
           uniqueDataSheet.getRange(lastRow+1,4).setValue(company[i].trim());
@@ -100,6 +103,12 @@ function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
 
   //リストのソート（日時の降順）
   uniqueDataSheet.getRange(2, 1, uniqueDataSheet.getLastRow(), uniqueDataSheet.getLastColumn()).sort({column: 2, ascending: false});
+
+  //最新のIDで上書き
+  spreadSheetByActive.getSheetByName(id_sheetname).getRange(2,1).setValue(id);
+
+  //共有シートへ転記
+  createList()
 
 }
 
