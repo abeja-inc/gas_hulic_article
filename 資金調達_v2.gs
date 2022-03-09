@@ -1,4 +1,4 @@
-const unique_sheetname = "test"
+const unique_sheetname = "Mock:資金調達情報"
 const id_sheetname = "id"
 const target_fromt_day = 8; //デフォルト前日 //00:00〜
 const target_to_day = 8; //デフォルト前日 //〜23:59
@@ -242,12 +242,6 @@ function isBeforeStartDate(date,start){
   }
 }
 
-function getPriorityTest(){
-
-  Logger.log(getPriority(0,"【速報】約1日で1,500万円（達成率100%）の資金調達完了！一般乗用車を活用したPRプラットフォーム運営のチアドライブ　株式投資型クラウドファンディングで資⾦調達を成功"));
-
-}
-
 //資金調達額 10億円以上：1
 //資金調達額 1億以上:2
 //タイトルに資金調達を含むかつ「から、より、実施」のいずれかを含む：3 ←ノイズニュース除外のための
@@ -257,7 +251,7 @@ function getPriority(result,title){
   var priority = 4;
   var ptr = /から|より|実施/;
 
-  Logger.log(ptr.test(title))
+  //Logger.log(ptr.test(title))
 
   if(result>=10){
     priority = 1;
