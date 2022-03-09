@@ -1,4 +1,4 @@
-const unique_sheetname = "Mock:資金調達情報"
+const unique_sheetname = "test"
 const id_sheetname = "id"
 const target_fromt_day = 8; //デフォルト前日 //00:00〜
 const target_to_day = 8; //デフォルト前日 //〜23:59
@@ -64,7 +64,7 @@ function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
             uniqueDataSheet.getRange(lastRow+1,11).setValue(result+"億円");
           }
 
-          var priority = (result >= 10) ? "1": (result != 0) ? "2": "3";
+          var priority =  getPriority(result,trim_title);
 
           uniqueDataSheet.getRange(lastRow+1,1).setValue(id);
           uniqueDataSheet.getRange(lastRow+1,2).setValue(time[i].trim());
@@ -240,4 +240,33 @@ function isBeforeStartDate(date,start){
   }else{
     return false;
   }
+}
+
+function getPriorityTest(){
+
+  Logger.log(getPriority(0,"【速報】約1日で1,500万円（達成率100%）の資金調達完了！一般乗用車を活用したPRプラットフォーム運営のチアドライブ　株式投資型クラウドファンディングで資⾦調達を成功"));
+
+}
+
+//資金調達額 10億円以上：1
+//資金調達額 1億以上:2
+//タイトルに資金調達を含むかつ「から、より、実施」のいずれかを含む：3 ←ノイズニュース除外のための
+//上記以外：4
+function getPriority(result,title){
+
+  var priority = 4;
+  var ptr = /から|より|実施/;
+
+  Logger.log(ptr.test(title))
+
+  if(result>=10){
+    priority = 1;
+  }else if(result!=0){
+    priority = 2;
+  }else if(title.indexOf('資金調達')!=-1 && ptr.test(title)){
+    priority = 3;
+  }
+
+  return priority;
+
 }
