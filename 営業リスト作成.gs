@@ -6,10 +6,10 @@ const dst_sheetName = "営業リスト";//書き込み先シート名
 function createList() {
 
   const create = () => {
-    const condition = {column: "C", value: 3};
+    const condition = {column: "C", value: 4};
     const isInStock = validatorBuilder(condition);
 
-    //優先度が3以外を抽出
+    //優先度が4以外を抽出
     const src = SpreadsheetApp.openById(src_id).getSheetByName(src_sheetName).getDataRange().getValues().filter(isInStock);
     if (src.length === 0) return;
 
