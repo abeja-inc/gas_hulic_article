@@ -53,7 +53,7 @@ function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
             var url = "https://prtimes.jp" + url.replace('"',"");
             var company_info = getCompanyInfo(url)
             var result = 0;
-            var trim_title = company_info.title;
+            var trim_title = zenkakuToHankaku(company_info.title).replace('．','.');
 
             if(trim_title.indexOf("億円", 0)!=-1){
               var slice_index = 0;
@@ -271,4 +271,10 @@ function getPriority(result,title){
 
   return priority;
 
+}
+
+function zenkakuToHankaku(str) {
+    return str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
+        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+    });
 }
