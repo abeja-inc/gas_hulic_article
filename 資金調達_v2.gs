@@ -2,6 +2,7 @@ const unique_sheetname = "Mock:資金調達情報"
 const id_sheetname = "id"
 const target_fromt_day = 8; //デフォルト前日 //00:00〜
 const target_to_day = 8; //デフォルト前日 //〜23:59
+const search_word = ['資金調達','資本業務提携','資本提携'];
 
 //朝6時に前日～当日（最新）の記事をSync
 function ReadURL_Cycle(){
@@ -16,87 +17,92 @@ function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
   let uniqueDataSheet   = spreadSheetByActive.getSheetByName(unique_sheetname)
   let lastRow = uniqueDataSheet.getLastRow();
 
-  var html = null;
-
-  //ページネーション判定
-  var next_flg = true;
-  var page_index = 1
-
   //最新のIDを取得
   var id = spreadSheetByActive.getSheetByName(id_sheetname).getRange(2,1).getValue();
 
-  while(next_flg){
+  search_word.forEach(function(word){
+    var html = null;
 
-    //Logger.log("page_index:"+page_index)
+    //ページネーション判定
+    var next_flg = true;
+    var page_index = 1
 
-    //https://prtimes.jp/main/action.php?run=html&page=searchkey&search_word=%E8%B3%87%E9%87%91%E8%AA%BF%E9%81%94&pagenum=2
-    html = fechHtmlByUrl("https://prtimes.jp/main/action.php?run=html&page=searchkey&search_word=%E8%B3%87%E9%87%91%E8%AA%BF%E9%81%94&pagenum=" + page_index)
+    while(next_flg){
 
-    if(html!=null){
+      //Logger.log("page_index:"+page_index)
 
-      var list = Parser.data(html).from('<article class="list-article">').to('</article>').iterate();
+      //https://prtimes.jp/main/action.php?run=html&page=searchkey&search_word=%E8%B3%87%E9%87%91%E8%AA%BF%E9%81%94&pagenum=2
+      html = fechHtmlByUrl("https://prtimes.jp/main/action.php?run=html&page=searchkey&search_word="+word+"&pagenum=" + page_index)
 
-      Logger.log(list)
+      if(html!=null){
 
-      var title = Parser.data(html).from('<h3 class="list-article__title">').to('</h3>').iterate();
-      var time = Parser.data(html).from('<time datetime="').to('" class="list-article__time">').iterate();
-      var company = Parser.data(html).from('<span class="list-article__company-name--dummy">').to('</span>').iterate();
-  
-      for(var i=0;i<title.length;i++){
+        var list = Parser.data(html).from('<article class="list-article">').to('</article>').iterate();
 
-        var url = Parser.data(list[i]).from('<a href="').to('class="list-article__link">').build();
+        Logger.log(list)
 
-        if(isTargetDate(new Date(time[i]),_from,_to)){
-          
-          var url = "https://prtimes.jp" + url.replace('"',"");
-          var company_info = getCompanyInfo(url)
-          var result = 0;
-          var trim_title = company_info.title;
+        var title = Parser.data(html).from('<h3 class="list-article__title">').to('</h3>').iterate();
+        var time = Parser.data(html).from('<time datetime="').to('" class="list-article__time">').iterate();
+        var company = Parser.data(html).from('<span class="list-article__company-name--dummy">').to('</span>').iterate();
+    
+        for(var i=0;i<title.length;i++){
 
-          if(trim_title.indexOf("億円", 0)!=-1){
-            var slice_index = 0;
-            if(trim_title.indexOf("億円", 0)>=5){
-              slice_index = trim_title.indexOf("億円", 0)-5;
+          var url = Parser.data(list[i]).from('<a href="').to('class="list-article__link">').build();
+
+          if(isTargetDate(new Date(time[i]),_from,_to)){
+            
+            var url = "https://prtimes.jp" + url.replace('"',"");
+            var company_info = getCompanyInfo(url)
+            var result = 0;
+            var trim_title = zenkakuToHankaku(company_info.title).replace('．','.');
+
+            if(trim_title.indexOf("億円", 0)!=-1){
+              var slice_index = 0;
+              if(trim_title.indexOf("億円", 0)>=5){
+                slice_index = trim_title.indexOf("億円", 0)-5;
+              }
+              var sliceText = trim_title.slice(slice_index, trim_title.indexOf("億円", 0))
+              var RegExp = /\d+\.?\d*|\d*\.?\d+/;
+              result = sliceText.match(RegExp);
+              uniqueDataSheet.getRange(lastRow+1,11).setValue(result+"億円");
             }
-            var sliceText = trim_title.slice(slice_index, trim_title.indexOf("億円", 0))
-            var RegExp = /\d+\.?\d*|\d*\.?\d+/;
-            result = sliceText.match(RegExp);
-            uniqueDataSheet.getRange(lastRow+1,11).setValue(result+"億円");
-          }
 
-          var priority =  getPriority(result,trim_title);
+            var priority =  getPriority(result,trim_title);
 
-          uniqueDataSheet.getRange(lastRow+1,1).setValue(id);
-          uniqueDataSheet.getRange(lastRow+1,2).setValue(time[i].trim());
-          uniqueDataSheet.getRange(lastRow+1,3).setValue(priority);
-          uniqueDataSheet.getRange(lastRow+1,4).setValue(company[i].trim());
-          uniqueDataSheet.getRange(lastRow+1,5).setValue(company_info.URL);
-          uniqueDataSheet.getRange(lastRow+1,8).setValue(company_info.本社所在地);
-          uniqueDataSheet.getRange(lastRow+1,9).setValue(company_info.設立);
-          uniqueDataSheet.getRange(lastRow+1,10).setValue(trim_title);
-          uniqueDataSheet.getRange(lastRow+1,12).setValue(company_info.資本金);
-          uniqueDataSheet.getRange(lastRow+1,13).setValue(url);
+            uniqueDataSheet.getRange(lastRow+1,1).setValue(id);
+            uniqueDataSheet.getRange(lastRow+1,2).setValue(time[i].trim());
+            uniqueDataSheet.getRange(lastRow+1,3).setValue(priority);
+            uniqueDataSheet.getRange(lastRow+1,4).setValue(company[i].trim());
+            uniqueDataSheet.getRange(lastRow+1,5).setValue(company_info.URL);
+            uniqueDataSheet.getRange(lastRow+1,8).setValue(company_info.本社所在地);
+            uniqueDataSheet.getRange(lastRow+1,9).setValue(company_info.設立);
+            uniqueDataSheet.getRange(lastRow+1,10).setValue(trim_title);
+            uniqueDataSheet.getRange(lastRow+1,12).setValue(company_info.資本金);
+            uniqueDataSheet.getRange(lastRow+1,13).setValue(url);
+            uniqueDataSheet.getRange(lastRow+1,14).setValue(word);
 
-          //移転情報の取得
-          if (priority != 3){
-            var trans_info = getTransferInfo(company[i].trim());
-            uniqueDataSheet.getRange(lastRow+1,7).setValue(trans_info.url);//修正しました
-            uniqueDataSheet.getRange(lastRow+1,6).setValue(trans_info.date);//修正しました
-          }
+            //移転情報の取得
+            if (priority != 3){
+              var trans_info = getTransferInfo(company[i].trim());
+              uniqueDataSheet.getRange(lastRow+1,7).setValue(trans_info.url);//修正しました
+              uniqueDataSheet.getRange(lastRow+1,6).setValue(trans_info.date);//修正しました
+            }
 
-          lastRow++
-          id++;
-          next_flg = true;
+            lastRow++
+            id++;
+            next_flg = true;
 
-        }else{
-          if(isBeforeStartDate(new Date(time[i]),_from)){
-            next_flg = false;
+          }else{
+            if(isBeforeStartDate(new Date(time[i]),_from)){
+              next_flg = false;
+            }
           }
         }
       }
+      page_index++;
     }
-    page_index++;
-  }
+
+  });
+
 
   //重複の削除（重複キー：日時、企業名、タイトル）
   uniqueDataSheet.getRange(2, 1, uniqueDataSheet.getLastRow(), uniqueDataSheet.getLastColumn()).removeDuplicates([2,4,10]);;
@@ -259,8 +265,16 @@ function getPriority(result,title){
     priority = 2;
   }else if(title.indexOf('資金調達')!=-1 && ptr.test(title)){
     priority = 3;
+  }else if(title.indexOf('資本業務提携')!=-1){
+    priority = 3;
   }
 
   return priority;
 
+}
+
+function zenkakuToHankaku(str) {
+    return str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
+        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+    });
 }
