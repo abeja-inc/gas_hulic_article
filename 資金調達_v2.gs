@@ -265,7 +265,7 @@ function getPriority(result,title){
     priority = 2;
   }else if(title.indexOf('資金調達')!=-1 && ptr.test(title)){
     priority = 3;
-  }else if(title.indexOf('提携')!=-1){
+  }else if(title.indexOf('資本業務提携')!=-1){
     priority = 3;
   }
 
