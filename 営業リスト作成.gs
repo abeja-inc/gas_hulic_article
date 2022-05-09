@@ -34,6 +34,15 @@ function createList() {
       dst.getRange(r,10).setValue(Utilities.formatDate(new Date(nds[1]), 'JST','yyyy/MM/dd HH:mm:ss')); //日時
       dst.getRange(r,11).setValue(nds[9]); //記事タイトル
       dst.getRange(r,12).setValue(nds[12]); //記事URL
+      //自動問い合わせ
+      dst.getRange(r,13).setValue(`https://script.google.com/a/macros/abejainc.com/s/AKfycbxE0HsmK8HzFA_uuOlLcfVU5G5JdGMnCQzE6HHIJC8X3G8HHant1zoYWgDyRf9Gy2W4/exec?id=${nds[0]}`) 
+            
+      if (notSubject(nds[10], nds[7])) {
+        dst.getRange(r,14).setValue("システム"); //名前
+        dst.getRange(r,15).setValue("対象外"); //ステータス
+        dst.getRange(r,16).setValue(Utilities.formatDate(new Date(), 'JST','yyyy/MM/dd HH:mm:ss')); //最終ステータス更新日
+      }
+
       r++;
     });
 
@@ -59,4 +68,16 @@ function deleteDuplicate(idArray,values){
   Logger.log("追加情報："+newValues)
   return newValues;
 
+}
+
+//2億円以下、都外を対象外
+function notSubject(capital, address){
+  const isNotTokyo = !address.match(/^(?!.*(北海道|大阪府|京都府|^.{2,3}県)).*([台江]東|中[央野]|([品荒]|江戸)川|([墨大]|千代)田|港|新宿|(世田|渋)谷|文京|目黒|杉並|豊島|北|板橋|練馬|足立|葛飾)区/);
+
+  if (capital == "") {
+    return isNotTokyo;
+  } else {
+    const intCapital = Number(capital.replace(/[^0-9.]/g, '')) * 100000000;
+    return isNotTokyo || (intCapital <= 200000000);
+  }
 }
