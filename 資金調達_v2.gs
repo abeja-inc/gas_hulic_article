@@ -55,15 +55,15 @@ function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
             var result = 0;
             var trim_title = zenkakuToHankaku(company_info.title).replace('．','.');
 
-            if(trim_title.indexOf("億円", 0)!=-1){
+            if(trim_title.indexOf("億", 0)!=-1){
               var slice_index = 0;
-              if(trim_title.indexOf("億円", 0)>=5){
-                slice_index = trim_title.indexOf("億円", 0)-5;
+              if(trim_title.indexOf("億", 0)>=5){
+                slice_index = trim_title.indexOf("億", 0)-5;
               }
-              var sliceText = trim_title.slice(slice_index, trim_title.indexOf("億円", 0))
+              var sliceText = trim_title.slice(slice_index, trim_title.indexOf("億", 0))
               var RegExp = /\d+\.?\d*|\d*\.?\d+/;
               result = sliceText.match(RegExp);
-              uniqueDataSheet.getRange(lastRow+1,11).setValue(result+"億円");
+              uniqueDataSheet.getRange(lastRow+1,11).setValue(result+"億");
             }
 
             var priority =  getPriority(result,trim_title);
@@ -103,12 +103,11 @@ function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
 
   });
 
-
   //重複の削除（重複キー：日時、企業名、タイトル）
-  uniqueDataSheet.getRange(2, 1, uniqueDataSheet.getLastRow(), uniqueDataSheet.getLastColumn()).removeDuplicates([2,4,10]);;
+  uniqueDataSheet.getRange(2, 1, uniqueDataSheet.getLastRow()-1, uniqueDataSheet.getLastColumn()).removeDuplicates([2,4]);;
 
   //リストのソート（日時の降順）
-  uniqueDataSheet.getRange(2, 1, uniqueDataSheet.getLastRow(), uniqueDataSheet.getLastColumn()).sort({column: 2, ascending: false});
+  uniqueDataSheet.getRange(2, 1, uniqueDataSheet.getLastRow()-1, uniqueDataSheet.getLastColumn()).sort({column: 2, ascending: false});
 
   //最新のIDで上書き
   spreadSheetByActive.getSheetByName(id_sheetname).getRange(2,1).setValue(id);
