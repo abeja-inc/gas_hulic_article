@@ -81,11 +81,11 @@ function ReadURL_prod(_from=target_fromt_day,_to=target_to_day){
             uniqueDataSheet.getRange(lastRow+1,14).setValue(word);
 
             //移転情報の取得
-            if (priority != 3){
-              var trans_info = getTransferInfo(company[i].trim());
-              uniqueDataSheet.getRange(lastRow+1,7).setValue(trans_info.url);//修正しました
-              uniqueDataSheet.getRange(lastRow+1,6).setValue(trans_info.date);//修正しました
-            }
+//            if (priority != 3){
+//              var trans_info = getTransferInfo(company[i].trim());
+//              uniqueDataSheet.getRange(lastRow+1,7).setValue(trans_info.url);//修正しました
+//              uniqueDataSheet.getRange(lastRow+1,6).setValue(trans_info.date);//修正しました
+//            }
 
             lastRow++
             id++;
